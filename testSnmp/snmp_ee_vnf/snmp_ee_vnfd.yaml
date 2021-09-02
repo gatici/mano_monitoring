@@ -1,0 +1,97 @@
+vnfd:
+  description: A basic virtual router with SNMP metrics collection
+  df:
+  - id: default-df
+    instantiation-level:
+    - id: default-instantiation-level
+      vdu-level:
+      - number-of-instances: 1
+        vdu-id: vyos-VM
+    vdu-profile:
+    - id: vyos-VM
+      min-number-of-instances: 1
+    lcm-operations-configuration:
+      operate-vnf-op-config:
+        day1-2:
+        - config-primitive:
+          - execution-environment-ref: monitor
+            name: generate_snmp
+          execution-environment-list:
+          - external-connection-point-ref: vnf-mgmt-ext
+            helm-chart: eechart
+            id: monitor
+            metric-service: snmpexporter
+          id: snmp_ee-vnf
+          initial-config-primitive:
+          - execution-environment-ref: monitor
+            name: config
+            parameter:
+            - name: ssh-hostname
+              value: <rw_mgmt_ip>
+            - name: ssh-username
+              value: osm
+            - name: ssh-password
+              value: osm2020
+            seq: 1
+          - execution-environment-ref: monitor
+            name: generate_snmp
+            seq: 2
+  ext-cpd:
+  - id: vnf-mgmt-ext
+    int-cpd:
+      cpd: vdu-eth0-int
+      vdu-id: vyos-VM
+  - id: vnf-internal-ext
+    int-cpd:
+      cpd: vdu-eth1-int
+      vdu-id: vyos-VM
+  - id: vnf-external-ext
+    int-cpd:
+      cpd: vdu-eth2-int
+      vdu-id: vyos-VM
+  id: snmp_ee-vnf
+  mgmt-cp: vnf-mgmt-ext
+  product-name: snmp_ee-vnf
+  sw-image-desc:
+  - id: vyos1.1.7
+    image: vyos1.1.7
+    name: vyos1.1.7
+  vdu:
+  - cloud-init-file: vyos-userdata
+    id: vyos-VM
+    int-cpd:
+    - id: vdu-eth0-int
+      virtual-network-interface-requirement:
+      - name: vdu-eth0
+        position: 0
+        virtual-interface:
+          type: PARAVIRT
+    - id: vdu-eth1-int
+      virtual-network-interface-requirement:
+      - name: vdu-eth1
+        position: 1
+        virtual-interface:
+          type: PARAVIRT
+    - id: vdu-eth2-int
+      virtual-network-interface-requirement:
+      - name: vdu-eth2
+        position: 2
+        virtual-interface:
+          type: PARAVIRT
+    name: vyos-VM
+    supplemental-boot-data:
+      boot-data-drive: true
+    sw-image-desc: vyos1.1.7
+    virtual-compute-desc: vyos-VM-compute
+    virtual-storage-desc:
+    - vyos-VM-storage
+  version: '1.0'
+  virtual-compute-desc:
+  - id: vyos-VM-compute
+    virtual-cpu:
+      num-virtual-cpu: 2
+    virtual-memory:
+      size: 4.0
+  virtual-storage-desc:
+  - id: vyos-VM-storage
+    size-of-storage: 10

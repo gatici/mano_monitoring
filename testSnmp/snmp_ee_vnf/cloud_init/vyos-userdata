@@ -1,0 +1,22 @@
+#!/bin/vbash
+source /opt/vyatta/etc/functions/script-template
+# Interface Config eth0
+set interfaces ethernet eth0 address dhcp
+set interfaces ethernet eth0 description VyOS-eth0
+# Interface Config eth1
+set interfaces ethernet eth1 address 10.0.0.1/24
+set interfaces ethernet eth1 description VyOS-eth1
+# Interface Config eth2
+set interfaces ethernet eth2 address 10.1.0.1/24
+set interfaces ethernet eth2 description VyOS-eth2
+# System config
+set system host-name vyos-osmTest
+set service ssh listen-address 0.0.0.0
+set service ssh port 22
+set system login user osm authentication plaintext-password osm2020
+# SNMP
+set service snmp community public authorization ro
+set service snmp location "OSM Labs"
+# Save
+commit
+save

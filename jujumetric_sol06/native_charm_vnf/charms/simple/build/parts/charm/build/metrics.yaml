@@ -1,0 +1,7 @@
+metrics:
+   cpu_util:
+     type: gauge
+     description: "# of users"
+   mem_free:
+     type: gauge
+     description: "5 minute load average"

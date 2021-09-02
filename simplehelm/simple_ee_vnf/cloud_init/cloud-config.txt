@@ -1,0 +1,7 @@
+#cloud-config
+#cloud-config
+user: cnrusr
+password: P5vKG6vE
+chpasswd: { expire: False }
+ssh_pwauth: True
+hostname: amf

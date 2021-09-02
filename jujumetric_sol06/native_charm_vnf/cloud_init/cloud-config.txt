@@ -1,0 +1,13 @@
+#cloud-config
+user: ubuntu
+password: test123
+chpasswd: { expire: False }
+ssh_pwauth: True
+hostname: pcf
+write_files:
+-   content: |
+        # My new helloworld file
+
+    owner: root:root
+    permissions: '0644'
+    path: /root/helloworld.txt

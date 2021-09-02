@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "snmpexporter.fullname" . }}
+  labels:
+    {{- include "snmpexporter.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 9116
+      protocol: TCP
+      name: snmp
+  selector:
+    {{- include "snmpexporter.selectorLabels" . | nindent 4 }}

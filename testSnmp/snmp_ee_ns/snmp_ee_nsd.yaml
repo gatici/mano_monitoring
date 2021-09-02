@@ -1,0 +1,32 @@
+nsd:
+  nsd:
+  - description: Single VyOS Router VNF with SNMP metrics
+    df:
+    - id: default-df
+      vnf-profile:
+      - id: VyOS Router
+        virtual-link-connectivity:
+        - constituent-cpd-id:
+          - constituent-base-element-id: VyOS Router
+            constituent-cpd-id: vnf-mgmt-ext
+          virtual-link-profile-id: mgmtnet
+        - constituent-cpd-id:
+          - constituent-base-element-id: VyOS Router
+            constituent-cpd-id: vnf-internal-ext
+          virtual-link-profile-id: internal
+        - constituent-cpd-id:
+          - constituent-base-element-id: VyOS Router
+            constituent-cpd-id: vnf-external-ext
+          virtual-link-profile-id: external
+        vnfd-id: snmp_ee-vnf
+    id: snmp_ee-ns
+    name: snmp_ee-ns
+    version: '1.0'
+    virtual-link-desc:
+    - id: mgmtnet
+      mgmt-network: true
+      vim-network-name: osmtest_mgmt
+    - id: internal
+    - id: external
+    vnfd-id:
+    - snmp_ee-vnf

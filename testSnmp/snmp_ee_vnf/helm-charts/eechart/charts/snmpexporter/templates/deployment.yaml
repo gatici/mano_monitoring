@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "snmpexporter.fullname" . }}
+  labels:
+    vnf: {{ .Values.global.osm.vnf_id | lower}}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "snmpexporter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "snmpexporter.selectorLabels" . | nindent 8 }}
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: vnf
+                operator: In
+                values:
+                - {{ .Values.global.osm.vnf_id | lower}}
+            topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsUser: 0
+      initContainers:
+        - name: init-config
+          image: busybox:1.28
+          command: ['sh', '-c', 'if [ ! -f "/etc/snmp_exporter/snmp.yml" ]; then cp /etc/snmp_exporter_init/snmp.yml /etc/snmp_exporter; fi']
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/snmp_exporter
+            - name: init-config-volume
+              mountPath: /etc/snmp_exporter_init
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.version }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 9116
+              protocol: TCP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/snmp_exporter
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - if [ ! -f "/etc/snmp_exporter/generator.yml" ]; then exit 0; else rm -f /etc/snmp_exporter/generator.yml && exit 1; fi
+            failureThreshold: 1
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config-volume
+          hostPath: 
+            path: "/var/lib/osm/snmp_exporter/{{ .Values.global.osm.vnf_id | lower }}/"
+        - name: init-config-volume
+          configMap:
+            name: "snmp-init-config-{{ .Values.global.osm.vnf_id | lower }}"
+          

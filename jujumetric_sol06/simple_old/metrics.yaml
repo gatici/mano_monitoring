@@ -1,0 +1,21 @@
+metrics:
+   users:
+     type: gauge
+     description: "# of users"
+     command: who|wc -l
+   load:
+     type: gauge
+     description: "5 minute load average"
+     command: cat /proc/loadavg |awk '{print $1}'
+   load_pct:
+     type: gauge
+     description: "1 minute load average percent"
+     command: cat /proc/loadavg  | awk '{load_pct=$1} END {print load_pct}'
+   cpu:
+     type: gauge
+     description: "Real time overall cpu usage"
+     command: cat  /proc/stat |  grep cpu  | awk -v RS="" '{print ($13-$2+$15-$4)*100/($13-$2+$15-$4+$16-$5)}'
+   memory:
+     type: gauge
+     description: "Real time overall memory usage"
+     command: free | grep Mem | awk '{print $3/$2 * 100.0}'  
